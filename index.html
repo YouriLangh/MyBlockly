@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Blockly Demo: Generating JavaScript</title>
+  <!-- Required imports for Blockly libraries -->
+  <script src="./node_modules/blockly/blockly_compressed.js"></script>
+  <script src="./node_modules/blockly/blocks_compressed.js"></script>
+  <script src="./node_modules/blockly/javascript_compressed.js"></script>
+  <script src="./node_modules/blockly/msg/en.js"></script>
+  <script src="customblocks.js"></script>
+
+<!-- Generic styling of HTML page -->
+  <style>
+    body {
+      background-color: #fff;
+      font-family: sans-serif;
+    }
+    h1 {
+      font-weight: normal;
+      font-size: 140%;
+    }
+  </style>
+</head>
+<body>
+  <!-- Layout of the page, dividing it in the blocklyDiv and the console-->
+  <div id="main_div" style="padding: 20px; border: 1px solid rgb(173, 173, 173)">
+    <div id="top_buttons">
+      <p>
+        <button onclick="showCode()">Show JavaScript</button>
+        <button onclick="runCode()">Run JavaScript</button>
+      </p>
+    </div>
+    <div id="Blockly">
+      <div id="tabs" style="display: flex; justify-content: space-between; width: 650px; border: 1px solid black">
+        <button  id="add">+</button>
+      <select  name="actor_list" id="actor_list" onchange="changeTab(this);">
+      </select>
+      </div>
+      <div id="blocklyDiv" style="height: 500px; width: 650px;"></div>
+    </div>
+    <div id="console" style="margin: 0; height: 200px; width: 700px; background-color: #262626; color: #509C35;">
+      <p id="console_p" style="padding: 7px; font-size: smaller;">
+         <!-- >> Ping <br>  >> Pong -->
+      </p>
+    </div>
+      <!-- A hidden BlocklyDiv is required to convert the blocks to code of the tabs that are not currently selected -->
+    <div id="hidden_blockyDiv" style="visibility: hidden; position: absolute; top: 0;">
+    </div>
+  </div>
+
+  <!-- The Toolbox with all the categories and the blocks therein. -->
+  <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
+    <category name="Flec" colour="#9fa55b" custom="FLEC">
+    </category>
+    <sep></sep>
+    <category name="Logic" colour="#5b80a5">
+      <block type="controls_if"></block>
+      <block type="logic_compare">
+        <field name="OP">EQ</field>
+      </block>
+      <block type="logic_operation">
+        <field name="OP">AND</field>
+      </block>
+      <block type="logic_negate"></block>
+      <block type="logic_boolean">
+        <field name="BOOL">TRUE</field>
+      </block>
+      <block type="logic_null"></block>
+      <block type="logic_ternary"></block>
+    </category>
+    <sep></sep>
+    <category name="Loops" colour="#F6BFFF">
+      <block type="controls_repeat_ext">
+        <value name="TIMES">
+          <shadow type="math_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="controls_whileUntil">
+        <field name="MODE">WHILE</field>
+      </block>
+      <block type="controls_for">
+        <field name="VAR" id="bV+@s1HGt(!`2Y}eYPe|">i</field>
+        <value name="FROM">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="TO">
+          <shadow type="math_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+        <value name="BY">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="controls_forEach">
+        <field name="VAR" id="d4yalWA.xm!|O@JLsXPD">j</field>
+      </block>
+      <block type="controls_flow_statements">
+        <field name="FLOW">BREAK</field>
+      </block>
+    </category>
+    <sep></sep>
+    <category name="Math" colour="#5b67a5">
+      <block type="math_number">
+        <field name="NUM">0</field>
+      </block>
+      <block type="math_arithmetic">
+        <field name="OP">ADD</field>
+        <value name="A">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="B">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_single">
+        <field name="OP">ROOT</field>
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">9</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_trig">
+        <field name="OP">SIN</field>
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">45</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_constant">
+        <field name="CONSTANT">PI</field>
+      </block>
+      <block type="math_number_property">
+        <mutation divisor_input="false"></mutation>
+        <field name="PROPERTY">EVEN</field>
+        <value name="NUMBER_TO_CHECK">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_round">
+        <field name="OP">ROUND</field>
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">3.1</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_on_list">
+        <mutation op="SUM"></mutation>
+        <field name="OP">SUM</field>
+      </block>
+      <block type="math_modulo">
+        <value name="DIVIDEND">
+          <shadow type="math_number">
+            <field name="NUM">64</field>
+          </shadow>
+        </value>
+        <value name="DIVISOR">
+          <shadow type="math_number">
+            <field name="NUM">10</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_constrain">
+        <value name="VALUE">
+          <shadow type="math_number">
+            <field name="NUM">50</field>
+          </shadow>
+        </value>
+        <value name="LOW">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="HIGH">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_random_int">
+        <value name="FROM">
+          <shadow type="math_number">
+            <field name="NUM">1</field>
+          </shadow>
+        </value>
+        <value name="TO">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="math_random_float"></block>
+    </category>
+    <sep></sep>
+    <category name="Text" colour="#5ba58c">
+      <block type="text">
+        <field name="TEXT"></field>
+      </block>
+      <block type="text_join">
+        <mutation items="2"></mutation>
+      </block>
+      <block type="text_append">
+        <field name="VAR" id="+1$NVcR++l=fw`~@||@i">item</field>
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT"></field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_length">
+        <value name="VALUE">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_isEmpty">
+        <value name="VALUE">
+          <shadow type="text">
+            <field name="TEXT"></field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_indexOf">
+        <field name="END">FIRST</field>
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR" id="h/bNW*st]Qzx.[gvx{xR">text</field>
+          </block>
+        </value>
+        <value name="FIND">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_charAt">
+        <mutation at="true"></mutation>
+        <field name="WHERE">FROM_START</field>
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR" id="h/bNW*st]Qzx.[gvx{xR">text</field>
+          </block>
+        </value>
+      </block>
+      <block type="text_getSubstring">
+        <mutation at1="true" at2="true"></mutation>
+        <field name="WHERE1">FROM_START</field>
+        <field name="WHERE2">FROM_START</field>
+        <value name="STRING">
+          <block type="variables_get">
+            <field name="VAR" id="h/bNW*st]Qzx.[gvx{xR">text</field>
+          </block>
+        </value>
+      </block>
+      <block type="text_changeCase">
+        <field name="CASE">UPPERCASE</field>
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_trim">
+        <field name="MODE">BOTH</field>
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_print">
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="text_prompt_ext">
+        <mutation type="TEXT"></mutation>
+        <field name="TYPE">TEXT</field>
+        <value name="TEXT">
+          <shadow type="text">
+            <field name="TEXT">abc</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <sep></sep>
+    <category name="Lists" colour="#745ba5">
+      <block type="lists_create_with">
+        <mutation items="0"></mutation>
+      </block>
+      <block type="lists_create_with">
+        <mutation items="3"></mutation>
+      </block>
+      <block type="lists_repeat">
+        <value name="NUM">
+          <shadow type="math_number">
+            <field name="NUM">5</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="lists_length"></block>
+      <block type="lists_isEmpty"></block>
+      <block type="lists_indexOf">
+        <field name="END">FIRST</field>
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR" id="pb$c|jhCmG0J6kt=GCk`">list</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_getIndex">
+        <mutation statement="false" at="true"></mutation>
+        <field name="MODE">GET</field>
+        <field name="WHERE">FROM_START</field>
+        <value name="VALUE">
+          <block type="variables_get">
+            <field name="VAR" id="pb$c|jhCmG0J6kt=GCk`">list</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_setIndex">
+        <mutation at="true"></mutation>
+        <field name="MODE">SET</field>
+        <field name="WHERE">FROM_START</field>
+        <value name="LIST">
+          <block type="variables_get">
+            <field name="VAR" id="pb$c|jhCmG0J6kt=GCk`">list</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_getSublist">
+        <mutation at1="true" at2="true"></mutation>
+        <field name="WHERE1">FROM_START</field>
+        <field name="WHERE2">FROM_START</field>
+        <value name="LIST">
+          <block type="variables_get">
+            <field name="VAR" id="pb$c|jhCmG0J6kt=GCk`">list</field>
+          </block>
+        </value>
+      </block>
+      <block type="lists_split">
+        <mutation mode="SPLIT"></mutation>
+        <field name="MODE">SPLIT</field>
+        <value name="DELIM">
+          <shadow type="text">
+            <field name="TEXT">,</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="lists_sort">
+        <field name="TYPE">NUMERIC</field>
+        <field name="DIRECTION">1</field>
+      </block>
+    </category>
+    <sep></sep>
+    <category name="Colour" colour="#a5745b">
+      <block type="colour_picker">
+        <field name="COLOUR">#ff0000</field>
+      </block>
+      <block type="colour_random"></block>
+      <block type="colour_rgb">
+        <value name="RED">
+          <shadow type="math_number">
+            <field name="NUM">100</field>
+          </shadow>
+        </value>
+        <value name="GREEN">
+          <shadow type="math_number">
+            <field name="NUM">50</field>
+          </shadow>
+        </value>
+        <value name="BLUE">
+          <shadow type="math_number">
+            <field name="NUM">0</field>
+          </shadow>
+        </value>
+      </block>
+      <block type="colour_blend">
+        <value name="COLOUR1">
+          <shadow type="colour_picker">
+            <field name="COLOUR">#ff0000</field>
+          </shadow>
+        </value>
+        <value name="COLOUR2">
+          <shadow type="colour_picker">
+            <field name="COLOUR">#3333ff</field>
+          </shadow>
+        </value>
+        <value name="RATIO">
+          <shadow type="math_number">
+            <field name="NUM">0.5</field>
+          </shadow>
+        </value>
+      </block>
+    </category>
+    <sep></sep>
+    <category name="Variables" colour="#a55b80" custom="VARIABLE"></category>
+    <category name="Functions" colour="#995ba5" custom="PROCEDURE"></category>
+</xml>
+  <script>
+    // Injection of the two different workspaces into the corresponding divs.
+  var demoWorkspace = Blockly.inject('blocklyDiv',
+        {media: './node_modules/blockly/media/',
+         toolbox: document.getElementById('toolbox')});
+  var hiddenWorkspace =  Blockly.inject('hidden_blockyDiv',
+        {media: './node_modules/blockly/media/'});
+
+    // Generic function called upon clicking the 'Show JavaScript' button
+    function showCode() {
+      // Current tab might have been edited, save these changes first
+      saveWorkspace();
+      Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
+      // Generate JavaScript code and display it (in browser console).
+      var code = generateCode();
+      console.log(code);
+    }
+
+    // Generic function called upon clicking the 'Run JavaScript' button
+    function runCode() {
+      // Current tab might have been edited, save these changes first
+      saveWorkspace();
+      // clear the console
+      clearConsole();
+      window.LoopTrap = 1000;
+      Blockly.JavaScript.INFINITE_LOOP_TRAP = 'if (--window.LoopTrap < 0) throw "Infinite loop.";\n';
+      // Generate JavaScript code and run it with eval(code).
+      var code = generateCode();
+      Blockly.JavaScript.INFINITE_LOOP_TRAP = null;
+      try {
+        eval(code);
+      } catch (e) {
+        alert(e);
+      }
+    }
+    
+    // Function called whenever Flec category gets opened.
+    var FlecCategoryCallback = function flyoutCategory(workspace) {
+      // Blocks which are always present in the category in XML.
+      let xmlList = createBlocks(blockTypeArray);
+      // Blocks that are dynamically added depending on environment
+      const dynamicBlocks = FlecDynamicCategoryBlocks(workspace);
+      xmlList = xmlList.concat(dynamicBlocks);
+      // Complete list of all blocks in the category
+      return xmlList;
+}
+
+// Function to dynamically populate a category.
+function FlecDynamicCategoryBlocks(workspace) {
+  let xmlList = [];
+  var e = document.getElementById('actor_list')
+   const discoveredBlocks = workspace.getAllBlocks()
+      // Traverse all the blocks in the current workspace and check their type, if either the 'when_discovered' or the 'on_receive' block has been used: 
+      // Allow the usage of the 'send_msg' block and add it to the category
+      for (let i = 0; i < discoveredBlocks.length; i++) {
+        if(discoveredBlocks[i].type == "when_discovered" || discoveredBlocks[i].type == "on_receive"){
+          // Create the 'send_msg' block and push it onto the xmlList (or xmlList = block)
+          xmlList = createBlocks(['send_msg']);
+          // Only need to find 1 example for the block to be added, then break.
+          break;}}
+      // Second for_loop will add a 'parameter block' for every formal parameter of each 'on_receive' block. 
+      // "On receive: ping with: x, y" will add the parameter blocks for x and y.
+      for (let i = 0; i < discoveredBlocks.length; i++) {
+        // Traverse all blocks, if the type is 'on_receive' and it requires arguments, add a block for each formal parameter.
+        if(discoveredBlocks[i].type == "on_receive" && discoveredBlocks[i].arguments_.length){
+          // All the arguments/parameters of a specific 'on_receive' block
+          let args = discoveredBlocks[i].arguments_;
+          // Traverse all the parameters of the block
+          for(let idx in args){
+            // Create a parameter block
+            let param_block = createBlocks(['param'])[0];
+            // Add a field for its name and fill in the correct name
+            const fieldNode = document.createElement('field');
+            fieldNode.setAttribute('name', 'param_name');
+            const argumentName = document.createTextNode(args[idx]);
+            // Append the name to the field and the field to the block
+            fieldNode.appendChild(argumentName);
+            param_block.appendChild(fieldNode);
+            xmlList.push(param_block)}}}
+  return xmlList}
+  // Add a callback for the Flec category to the workspace
+  demoWorkspace.registerToolboxCategoryCallback(
+    'FLEC', FlecCategoryCallback);
+    // initialize the javascript generator
+  Blockly.JavaScript.init(demoWorkspace)
+    </script>
+  <!-- Imports for Flec -->
+<script src="functions.js"></script>
+<script src="config.js"></script>
+<script src="./Flec/dist/message.js"></script>
+<script src="./Flec/dist/simplepromise.js"></script>
+<script src="./Flec/dist/promise_util.js"></script>
+<script src="./Flec/dist/farref.js"></script>
+<script src="./Flec/dist/switchboard.js"></script>
+<script src="./Flec/dist/actor.js"></script>
+<script src="./Flec/dist/tsat.js"></script>
+</body>
+</html>
+

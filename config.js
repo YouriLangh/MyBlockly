@@ -1,0 +1,12 @@
+const WHEN_DISCOVERED_MSG = "When an actor discovers an exported object, do something"
+const PARAM_MSG = "Represents the parameter of an on_receive block"
+const SEND_ARG_MSG = "Add an argument to the message being sent"
+const RETURN_MSG = "Return a value and break out of a loop"
+const EXPORT_FROM_MSG = "Allows an actor to export an object with a certain tag"
+const SEND_MSG = "Send a message to an object"
+const SEND_CREATE_MSG = "Add arguments to reconfigure the send message block"
+const CLASS_MSG = "Create an instance of a class and define the behavior of that class"
+const RECEIVE_ARG_MSG = "Add an argument to the function defining the behavior"
+const CONSOLE_MSG = "Display a message in the console"
+const TIMEOUT_MSG = 'Delay the execution of the body by a certain amount of time'
+const RECEIVE_MSG = 'Define the behavior of an object when receiving a certain message'
