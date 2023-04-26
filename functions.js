@@ -6,12 +6,21 @@ let current = -1;
 // jsonList[i] = All the blocks for actor i in JSON
 var jsonList = [];
 // array holding all the types of blocks that have to be created in the Flec category on initialization
-let blockTypeArray = ['when_discovered', 'export_from', 'class_block', 'on_receive', 'console_log', 'return', 'time_out']
+let blockTypeArray = ['when_discovered', 'export_from', 'class_block', 'on_receive', 'console_log', 'return', 'time_out', 'crdt', 'crdt_function']
 // a Map which holds all the objects created in the workspace as ["class", new class()]
 const objectMap = new Map()
 // Button for adding new tabs/actors
 let addButton =  document.getElementById("add");
 addButton.addEventListener("click", addTab);
+let A1Button =  document.getElementById("A1Enter");
+addButton.addEventListener("click", addTab);
+let A2Button =  document.getElementById("A2Enter");
+addButton.addEventListener("click", addTab);
+let showButton =  document.getElementById("show");
+addButton.addEventListener("click", addTab);
+
+
+
 
 /**
  * Function to print to console on HTML page
