@@ -1,14 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CRDT_RCB = exports.GarbageCollectReason = void 0;
-const vc_1 = require("../clocks/vc");
-const AuthInfo_1 = require("./AuthInfo");
-const console_1 = require("console");
-const Operation_1 = require("./Operation");
-var GarbageCollectReason;
-(function (GarbageCollectReason) {
-    GarbageCollectReason[GarbageCollectReason["NewOperation"] = 0] = "NewOperation";
-})(GarbageCollectReason = exports.GarbageCollectReason || (exports.GarbageCollectReason = {}));
+class rcbEnum{
+    constructor(){
+        this.NewOperation = 0;
+    }
+}
+const GarbageCollectReason = new rcbEnum();
 class BufferEntry {
     constructor(clock, op, local, data) {
         this.clock = clock;
@@ -39,7 +34,7 @@ class CRDT_RCB {
         this.callback = callback;
     }
     setParent(parent) {
-        (0, console_1.assert)(this.isChild === false);
+        //(0, console_1.assert)(this.isChild === false);
         this.clock = parent.clock;
         this.id = this.clock.getId();
         this.isChild = true;
@@ -66,7 +61,7 @@ class CRDT_RCB {
         const me = this;
         const ref = actor.getFarRef(this);
         this.id = ref.getNetworkId();
-        this.clock = new vc_1.VectorClock(this.id);
+        this.clock = new VectorClock(this.id);
         actor.doExport(this.tag, this);
         actor.whenDiscovered(this.tag, fr => {
             this.replicas.push(fr);
@@ -76,11 +71,11 @@ class CRDT_RCB {
             return me.parseAuth(msg);
         });
         this.onLoaded();
-        this.authInfo = new AuthInfo_1.AuthInfo();
+        this.authInfo = new AuthInfo();
     }
     onNewReplica(ref, refs) {
         const id = ref.__id__();
-        this.remoteClocks[id] = new vc_1.VectorClock(id);
+        this.remoteClocks[id] = new VectorClock(id);
         //console.log(ref.__meta__);
         ref.__meta__().registerPreSendHook((ref, msg, oneway) => {
             msg.annotations = this.authInfo;
@@ -115,11 +110,11 @@ class CRDT_RCB {
         return this.clock.getUniqueId();
     }
     performOp(op, args) {
-        let cop = new Operation_1.CRDTOperation(op, args);
+        let cop = new CRDTOperation(op, args);
         return this.performOperation(cop);
     }
     performNestedOp(op, path, args) {
-        let cop = new Operation_1.NestedCRDTOperation(op.toString(), path, args);
+        let cop = new NestedCRDTOperation(op.toString(), path, args);
         return this.performOperation(cop);
     }
     performReplicasOp(clock, op) {
@@ -174,7 +169,7 @@ class CRDT_RCB {
     }
     parseAuth(msg) {
         if (msg.key == this.doOperation.name) {
-            let ai = new AuthInfo_1.AuthInfo();
+            let ai = new AuthInfo();
             if (typeof msg.annotations !== "undefined") {
                 ai.user = msg.annotations.user || "";
                 //ai.user = msg.annotations.token || "";
@@ -244,7 +239,7 @@ class CRDT_RCB {
             const local_op = op.operation;
             const top_path = path[0];
             // perform 'shell' operation locally -> mostly this is just an update function, not the final operation
-            const local_update = new Operation_1.CRDTOperation(local_op, [top_path.key]);
+            const local_update = new CRDTOperation(local_op, [top_path.key]);
             local_update.properties = op.properties;
             this.onOperation(clock, local_update, null); // create new operation for this?
             // 1. need update operation locally
@@ -260,10 +255,10 @@ class CRDT_RCB {
                 const remaining_path = path.slice(1);
                 let operation;
                 if (remaining_path.length > 0)
-                    operation = new Operation_1.NestedCRDTOperation(top_path.op, remaining_path, op.args);
+                    operation = new NestedCRDTOperation(top_path.op, remaining_path, op.args);
                 //child.performNestedOp(top_path.op, remaining_path, op.args);
                 else
-                    operation = new Operation_1.CRDTOperation(top_path.op, op.args);
+                    operation = new CRDTOperation(top_path.op, op.args);
                 //child.performOp(top_path.op, op.args);
                 operation.properties = op.properties;
                 child.performOperation(operation);
@@ -275,7 +270,7 @@ class CRDT_RCB {
     }
     onRCBOperation(rclock, op) {
         switch (op.operation) {
-            case Operation_1.RCBOp.Stable:
+            case RCBOp.Stable:
                 //console.log("receive stable", rclock.id);
                 this.setStable(rclock.getId(), rclock.localValue());
                 break;
@@ -326,7 +321,7 @@ class CRDT_RCB {
     }
     performStableMsg(clock) {
         //console.log("Sending stable message", this.id);
-        let cop = new Operation_1.RCBOperation(Operation_1.RCBOp.Stable, []);
+        let cop = new RCBOperation(RCBOp.Stable, []);
         this.replicas.forEach(r => {
             this.count_send++;
             r.doOperation(clock, cop, false);
@@ -350,5 +345,4 @@ class CRDT_RCB {
         return out;
     }
 }
-exports.CRDT_RCB = CRDT_RCB;
 //# sourceMappingURL=crdt_rcb.js.map

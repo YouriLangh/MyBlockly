@@ -50,5 +50,4 @@ class CRDT {
         return this.id + "__" + (this.cnt++);
     }
 }
-exports.CRDT = CRDT;
 //# sourceMappingURL=crdt.js.map

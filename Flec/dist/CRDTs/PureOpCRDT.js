@@ -1,8 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.PureOpCRDT = void 0;
-const crdt_rcb_1 = require("./crdt_rcb");
-const POLogEntry_1 = require("./POLogEntry");
 class PerformProxy {
     get(target, p, receiver) {
         return (...args) => {
@@ -11,7 +6,7 @@ class PerformProxy {
         };
     }
 }
-class PureOpCRDT extends crdt_rcb_1.CRDT_RCB {
+class PureOpCRDT extends CRDT_RCB {
     constructor() {
         super();
         this.log = [];
@@ -86,7 +81,7 @@ class PureOpCRDT extends crdt_rcb_1.CRDT_RCB {
         this.clock.addProcess(this.id, state.clock.getLocalClock());
     }
     createLogEntry(clock, op) {
-        const entry = POLogEntry_1._POLogEntry.create(clock, op.operation, op.args);
+        const entry = _POLogEntry.create(clock, op.operation, op.args);
         // copy over properties
         // TODO: think about optimizing this
         for (const prop of op.getPropertyNames()) {
@@ -261,5 +256,3 @@ class PureOpCRDT extends crdt_rcb_1.CRDT_RCB {
         return true;
     }
 }
-exports.PureOpCRDT = PureOpCRDT;
-//# sourceMappingURL=PureOpCRDT.js.map

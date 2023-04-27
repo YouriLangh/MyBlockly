@@ -1,8 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.AWSet = void 0;
-const PureOpCRDT_1 = require("../../PureOpCRDT");
-class AWSet extends PureOpCRDT_1.PureOpCRDT {
+class AWSet extends PureOpCRDT {
     isPrecedingOperationRedundant(existing, arriving, isRedundant) {
         return arriving.isClear() ||
             existing.hasSameArgAs(arriving);
@@ -34,5 +30,3 @@ class AWSet extends PureOpCRDT_1.PureOpCRDT {
         this.perform.clear();
     }
 }
-exports.AWSet = AWSet;
-//# sourceMappingURL=awset.js.map

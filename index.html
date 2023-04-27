@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -39,8 +40,8 @@
       </div>
       <div id="blocklyDiv" style="height: 500px; width: 650px;"></div>
     </div>
-    <input type="text" id="A1" name="A1"> <button id="A1Enter" type="button">Enter</button><br>
-    <input type="text" id="A2" name="A2"> <button id="A2Enter" type="button">Enter</button> <br>
+    <span>Add to CRDT of "pingpong":</span><input type="text" id="A1" name="A1"> <button id="A1Enter" type="button">Enter</button><br>
+    <span>Add to CRDT of "pingpong2":</span><input type="text" id="A2" name="A2"> <button id="A2Enter" type="button">Enter</button> <br>
     <button id="show" type="button">Show</button>
     <div id="console" style="margin: 0; height: 200px; width: 700px; background-color: #262626; color: #509C35;">
       <p id="console_p" style="padding: 7px; font-size: smaller;">
@@ -523,6 +524,17 @@ function FlecDynamicCategoryBlocks(workspace) {
 <script src="./Flec/dist/switchboard.js"></script>
 <script src="./Flec/dist/actor.js"></script>
 <script src="./Flec/dist/tsat.js"></script>
+
+
+<script src="./Flec/dist/CRDTs/AuthInfo.js"></script>
+<script src="./Flec/dist/clocks/vc.js"></script>
+<script src="./Flec/dist/CRDTs/Operation.js"></script>
+<script src="./Flec/dist/CRDTs/crdt_rcb.js"></script>
+<script src="./Flec/dist/CRDTs/POLogEntry.js"></script>
+<script src="./Flec/dist/CRDTs/PureOpCRDT.js"></script>
+<script src="./Flec/dist/CRDTs/Impl/sets/awset.js"></script>
+
+
 </body>
 </html>
 

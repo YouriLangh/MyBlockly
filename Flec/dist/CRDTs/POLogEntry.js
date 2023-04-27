@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports._POLogEntry = void 0;
 const PROXY_IS_PREFIX = "is";
 class EntryProxy {
     get(target, p, receiver) {
@@ -70,5 +67,4 @@ class _POLogEntry {
         return this.clock.toString() + "\t" + (this.stable ? "stable" : "     ") + "\t" + this.operation.toString() + "(" + this.args.join(", ") + ")";
     }
 }
-exports._POLogEntry = _POLogEntry;
 //# sourceMappingURL=POLogEntry.js.map

@@ -14,6 +14,7 @@ Blockly.Blocks['when_discovered'] = {
         this.setInputsInline(true);
         this.setColour(265);
         this.setTooltip(WHEN_DISCOVERED_MSG);
+        this
   },
   dynamicActor: function() {
       var e = document.getElementById('actor_list');
@@ -40,34 +41,6 @@ Blockly.Blocks['send_msg_arg'] = {
     this.setNextStatement(true, null);
     this.setColour(220);
     this.setTooltip(SEND_ARG_MSG);}
-};
-// Definition of the 'return' block
-Blockly.Blocks['return'] = {
-  init: function() {
-    this.appendValueInput("return_value")
-    .setCheck(null)
-    .appendField("return");
-    this.setPreviousStatement(true, null);
-    this.setColour(230);
-    this.setTooltip(RETURN_MSG);
-    }
-};
-// Definition of the 'export_from' block
-Blockly.Blocks['export_from'] = {
-  init: function() {
-    this.appendDummyInput()
-    .appendField("export")
-    .appendField(new Blockly.FieldTextInput("pingpong"), "object")
-    .appendField("from")
-    .appendField(new Blockly.FieldTextInput(this.dynamicActor()), "ACTOR");
-    this.setInputsInline(true);
-    this.setColour(45);
-    this.setTooltip(EXPORT_FROM_MSG);
-    },
-    dynamicActor: function() {
-      var dropdown = document.getElementById('actor_list');
-      var actor = dropdown[current].text;
-      return actor}
 };
 // Definition of the 'send_msg' block
 Blockly.Blocks['send_msg'] = {
@@ -267,16 +240,29 @@ Blockly.Blocks['class_block'] = {
       // Add new inputs.
       for (let i = 0; i < this.crdts_; i++) {
         if (!this.getInput('ADD' + i)) {
-          const input = this.appendValueInput('ADD' + i).setAlign(Blockly.ALIGN_RIGHT);
+          const input = this.appendValueInput('ADD' + i)
+          .setCheck("CRDT");
+          this.removeInput('class_behavior', /* no error */ true);
           if(i == 0){
-            input.appendField('Contains CRDTS: ')
+            input.appendField('With: ')
+          } else {
+            input.appendField(', ')
           }
-            input.appendField('CRDT ' + i + ':');
+          const dummy = this.appendDummyInput("DUMMY" + i)
+          dummy.appendField("as")
+          dummy.appendField(new Blockly.FieldTextInput("list"), "NAME" + i)
+          dummy.appendField("share?")
+          dummy.appendField(new Blockly.FieldCheckbox("TRUE"), "SHARE" + i);
+            // input.appendField('CRDT ' + i + ':');
+            if(i == this.crdts_ - 1){
+              this.appendStatementInput('class_behavior');
+            }
         }
       }
       // Remove deleted inputs.
       for (let i = this.crdts_; this.getInput('ADD' + i); i++) {
         this.removeInput('ADD' + i);
+        this.removeInput('DUMMY' + i)
       }
     },
   dynamicActor: function() {
@@ -424,11 +410,7 @@ Blockly.Blocks['crdt'] = {
   init: function() {
     this.appendDummyInput()
         .appendField(new Blockly.FieldDropdown([["AWSet","AWSet"], ["ORSet","ORSet"]]), "CRDT_type")
-        .appendField("as")
-        .appendField(new Blockly.FieldTextInput("list"), "reference")
-        .appendField("publish crdt?")
-        .appendField(new Blockly.FieldCheckbox("TRUE"), "publish");
-    this.setOutput(true, null);
+    this.setOutput(true, "CRDT");
     this.setColour(75);
  this.setTooltip("");
  this.setHelpUrl("");
@@ -458,20 +440,71 @@ Blockly.Blocks['receive_mutator_container'] = {
 
   Blockly.Blocks['crdt_function'] = {
     init: function() {
-      this.appendValueInput("value")
-          .setCheck(null)
-          .appendField(new Blockly.FieldTextInput("add"), "function");
-      this.appendDummyInput()
-          .appendField("to")
-          .appendField(new Blockly.FieldTextInput("list"), "obj");
+      var options = [
+        ["add","add"],
+        ["remove","remove"],
+        ["serialize","serialize"],
+       ];
+       this.appendDummyInput()
+       .appendField(new Blockly.FieldDropdown(options, this.validate), 'FUNCTIONS')
+       this.appendValueInput("element")
+       .setCheck(null)
+      this.appendValueInput("instance")
+      .setCheck("INSTANCE")
+      .appendField('to', 'TEXT')
       this.setPreviousStatement(true, null);
       this.setNextStatement(true, null);
+      this.setColour(50);
+      this.setInputsInline(true);
+   this.setTooltip("");
+   this.setHelpUrl("");
+    },
+    validate: function(newValue) {
+      this.getSourceBlock().updateConnections(newValue);
+      return newValue;
+    },
+    updateConnections: function(newValue) {
+      this.removeInput('instance', /* no error */ true);
+      this.removeInput('element', /* no error */ true);
+      if (newValue == 'remove') {
+        this.appendValueInput("element")
+       .setCheck(null)
+      this.appendValueInput("instance")
+      .setCheck("INSTANCE")
+      .appendField('from', 'TEXT')
+      } else if (newValue == 'serialize') {
+        this.appendValueInput('instance')
+        .setCheck("INSTANCE")
+      } else if (newValue == 'add'){
+        this.appendValueInput("element")
+       .setCheck(null)
+      this.appendValueInput("instance")
+      .setCheck("INSTANCE")
+      .appendField('to', 'TEXT')
+
+      }
+    }
+  };
+
+  Blockly.Blocks['instance'] = {
+    init: function() {
+      this.appendValueInput("instance")
+          .setCheck(null)
+          .appendField("instance of");
+      this.setInputsInline(true);
+      this.setOutput(true, "INSTANCE");
       this.setColour(50);
    this.setTooltip("");
    this.setHelpUrl("");
     }
   };
-
+  Blockly.JavaScript['instance'] = function(block) {
+    var value_instance = Blockly.JavaScript.valueToCode(block, 'instance', Blockly.JavaScript.ORDER_ATOMIC);
+    // TODO: Assemble JavaScript into code variable.
+    var code = `this.${value_instance}`;
+    // TODO: Change ORDER_NONE to the correct strength.
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
+  };
 // Generate the corresponding JavaScript for each block
 /**
  * Define the behavior of the 'on_receive' block. 
@@ -491,23 +524,21 @@ Blockly.JavaScript['on_receive'] = function(block) {
 };
 Blockly.JavaScript['crdt'] = function(block) {
   var dropdown_crdt_type = block.getFieldValue('CRDT_type');
-  var text_reference = block.getFieldValue('reference');
-  var id = block.data;
-  var checkbox_publish = block.getFieldValue('publish') === 'TRUE';
-  var code = `this.${text_reference} = new ${dropdown_crdt_type}();`;
-  if(checkbox_publish){
-    code += `\n this.${text_reference}.goOnline(Actor_${id}, "shared");`
-  }
+  var code = `new ${dropdown_crdt_type}();`;
   return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
 Blockly.JavaScript['crdt_function'] = function(block) {
-  var text_function = block.getFieldValue('function');
-  var value_name = Blockly.JavaScript.valueToCode(block, 'value', Blockly.JavaScript.ORDER_ATOMIC);
-  var text_obj = block.getFieldValue('obj');
-  console.log(`${text_obj}.${text_function}(${value_name});\n`)
-  // TODO: Assemble JavaScript into code variable.
-  var code = `this.${text_obj}.${text_function}(${value_name});\n`;
+  var dropdown_functions = block.getFieldValue('FUNCTIONS');
+  var value_instance = Blockly.JavaScript.valueToCode(block, 'instance', Blockly.JavaScript.ORDER_ATOMIC);
+  var value_element = Blockly.JavaScript.valueToCode(block, 'element', Blockly.JavaScript.ORDER_ATOMIC);
+  console.log(dropdown_functions)
+  var code = "";
+  if(dropdown_functions == "add" || dropdown_functions == "remove"){
+    code =  `${value_instance}.${dropdown_functions}(${value_element});\n`
+  } else {
+    code = `console.log(${value_instance}.serialize());\n`
+  }
   return code;
 };
 
@@ -518,8 +549,14 @@ Blockly.JavaScript['class_block'] = function(block) {
   var statements_class_behavior = Blockly.JavaScript.statementToCode(block, 'class_behavior');
   const elements = [];
   for (let i = 0; i < block.crdts_; i++) {
-    elements[i] =
-      Blockly.JavaScript.valueToCode(block, 'ADD' + i, Blockly.JavaScript.ORDER_NONE) || '';
+      var crdt = Blockly.JavaScript.valueToCode(block, 'ADD' + i, Blockly.JavaScript.ORDER_NONE) || '';
+      var name = block.getFieldValue('NAME' + i)
+      var share = block.getFieldValue('SHARE' + i) === 'TRUE';
+      var elemCode = `this.${name} = ${crdt}\n`
+      if(share){
+        elemCode += `this.${name}.goOnline(Actor_${id}, "shared");\n`
+      }
+      elements[i] = elemCode
   }
   var code = ''
   if(toExport){
@@ -533,12 +570,6 @@ Blockly.JavaScript['class_block'] = function(block) {
   return code;
 };
 
-Blockly.JavaScript['export_from'] = function(block) {
-  var actor = block.getFieldValue("ACTOR");
-  var object_name = block.getFieldValue('object') || '';
-  var code = `${actor}.doExport('${object_name}', `+ `getObject('${object_name}')` + `); \n`;
-  return code;
-};
 
 Blockly.JavaScript['when_discovered'] = function(block) {
   var actor = block.getFieldValue("ACTOR");
@@ -581,45 +612,9 @@ Blockly.JavaScript['param'] = function(block) {
   return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
-Blockly.JavaScript['return'] = function(block) {
-  var value_return = Blockly.JavaScript.valueToCode(block, 'return_value', Blockly.JavaScript.ORDER_ATOMIC);
-  var code = 'return ' + value_return +  ';\n';
-  return code;
-};
-
 Blockly.JavaScript['time_out'] = function(block) {
   var text_time = block.getFieldValue('time');
   var statements_name = Blockly.JavaScript.statementToCode(block, 'body');
   var code = `setTimeout(() => {\n${statements_name}}, ${text_time});\n`
   return code;
 };
-
-  // Blockly.Blocks['block_type'] = {
-  //   init: function() {
-  //     this.appendDummyInput()
-  //         .appendField("send msg");
-  //     this.setPreviousStatement(true, null);
-  //     this.setNextStatement(true, null);
-  //     this.setColour(230);
-  //     this.setOutput(true, null);
-  //  this.setTooltip("");
-  //  this.setHelpUrl("");
-  //   }
-  // }
-
-  // Blockly.Blocks['crdt'] = {
-  //   init: function() {
-  //     this.appendDummyInput()
-  //         .appendField(new Blockly.FieldDropdown([["AW set","AWSet"], ["OR set","ORSet"]]), "crdts");
-  //     this.setOutput(true, "CRDT");
-  //     this.setColour(105);
-  //  this.setTooltip("");
-  //  this.setHelpUrl("");
-  //   }
-  // };
-
-// Blockly.JavaScript['crdt'] = function(block) {
-//   var dropdown_crdts = block.getFieldValue('crdts');
-//     var code = `${dropdown_crdts}`;
-//     return [code, Blockly.JavaScript.ORDER_ATOMIC];
-// };

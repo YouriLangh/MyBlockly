@@ -1,16 +1,18 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.NestedCRDTOperation = exports.RCBOperation = exports.CRDTOperation = exports.Operation = exports.RCBOp = exports.OperationType = void 0;
-var OperationType;
-(function (OperationType) {
-    OperationType[OperationType["RCB_Operation"] = 0] = "RCB_Operation";
-    OperationType[OperationType["CRDT_Operation"] = 1] = "CRDT_Operation";
-    OperationType[OperationType["Nested_CRDT_Operation"] = 2] = "Nested_CRDT_Operation";
-})(OperationType = exports.OperationType || (exports.OperationType = {}));
-var RCBOp;
-(function (RCBOp) {
-    RCBOp[RCBOp["Stable"] = 0] = "Stable";
-})(RCBOp = exports.RCBOp || (exports.RCBOp = {}));
+class anotherEnum{
+    constructor(){
+        this.RCB_Operation = 0;
+        this.CRDT_Operation = 1;
+        this.Nested_CRDT_Operation = 2;
+    }
+}
+const OperationType = new anotherEnum();
+
+class anotherEnum2{
+    constructor(){
+        this.Stable = 0;
+    }
+}
+const RCBOp = new anotherEnum2();
 class Operation {
     constructor(args) {
         this.args = args;
@@ -51,7 +53,6 @@ class Operation {
         return c;
     }
 }
-exports.Operation = Operation;
 class CRDTOperation extends Operation {
     constructor(op, args) {
         super(args);
@@ -63,7 +64,6 @@ class CRDTOperation extends Operation {
         return new CRDTOperation(o.operation, o.args);
     }
 }
-exports.CRDTOperation = CRDTOperation;
 class RCBOperation extends Operation {
     constructor(op, args) {
         super(args);
@@ -75,7 +75,6 @@ class RCBOperation extends Operation {
         return new RCBOperation(o.operation, o.args);
     }
 }
-exports.RCBOperation = RCBOperation;
 class NestedCRDTOperation extends Operation {
     constructor(op, path, args) {
         super(args);
@@ -91,5 +90,4 @@ class NestedCRDTOperation extends Operation {
         return new CRDTOperation(this.path[0].op, this.args);
     }
 }
-exports.NestedCRDTOperation = NestedCRDTOperation;
 //# sourceMappingURL=Operation.js.map

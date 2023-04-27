@@ -6,21 +6,40 @@ let current = -1;
 // jsonList[i] = All the blocks for actor i in JSON
 var jsonList = [];
 // array holding all the types of blocks that have to be created in the Flec category on initialization
-let blockTypeArray = ['when_discovered', 'export_from', 'class_block', 'on_receive', 'console_log', 'return', 'time_out', 'crdt', 'crdt_function']
+let blockTypeArray = ['when_discovered', 'class_block', 'on_receive', 'console_log', 'time_out', 'crdt', 'crdt_function', 'instance']
 // a Map which holds all the objects created in the workspace as ["class", new class()]
 const objectMap = new Map()
 // Button for adding new tabs/actors
-let addButton =  document.getElementById("add");
+let addButton = document.getElementById("add");
 addButton.addEventListener("click", addTab);
-let A1Button =  document.getElementById("A1Enter");
-addButton.addEventListener("click", addTab);
-let A2Button =  document.getElementById("A2Enter");
-addButton.addEventListener("click", addTab);
-let showButton =  document.getElementById("show");
-addButton.addEventListener("click", addTab);
+let A1Button = document.getElementById("A1Enter");
+A1Button.addEventListener("click", A1);
+let A2Button = document.getElementById("A2Enter");
+A2Button.addEventListener("click", A2);
+let showButton = document.getElementById("show");
+showButton.addEventListener("click", showCRDT);
+//TODO: Send Msg + expects reply back when calling the add procedure of another actor (add .. to list) will not work due to promise conflict. 
+function A1(){
+  let obj = objectMap.get("pingpong");
+  var input = document.getElementById("A1")
+  obj.list.add(`'${input.value}'`)
+  input.value = '';
+}
 
+function A2(){
+  let obj = objectMap.get("pingpong2");
+  var input = document.getElementById("A2")
+  obj.list.add(`'${input.value}'`)
 
+  // eval(input.value)
+  input.value = '';
+}
 
+function showCRDT(){
+  let obj = objectMap.get("pingpong")
+  console.log(obj.list.serialize())
+  // print([obj.list.serialize()]);
+}
 
 /**
  * Function to print to console on HTML page

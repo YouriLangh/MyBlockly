@@ -1,6 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.VectorClock = void 0;
 class VectorClock {
     constructor(id) {
         this.id = id;
@@ -121,5 +118,4 @@ class VectorClock {
         return this.id + ":" + Object.values(this.hashmap).toString();
     }
 }
-exports.VectorClock = VectorClock;
 //# sourceMappingURL=vc.js.map
