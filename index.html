@@ -39,6 +39,9 @@
       </div>
       <div id="blocklyDiv" style="height: 500px; width: 650px;"></div>
     </div>
+    <input type="text" id="A1" name="A1"> <button id="A1Enter" type="button">Enter</button><br>
+    <input type="text" id="A2" name="A2"> <button id="A2Enter" type="button">Enter</button> <br>
+    <button id="show" type="button">Show</button>
     <div id="console" style="margin: 0; height: 200px; width: 700px; background-color: #262626; color: #509C35;">
       <p id="console_p" style="padding: 7px; font-size: smaller;">
          <!-- >> Ping <br>  >> Pong -->
@@ -501,6 +504,14 @@ function FlecDynamicCategoryBlocks(workspace) {
     'FLEC', FlecCategoryCallback);
     // initialize the javascript generator
   Blockly.JavaScript.init(demoWorkspace)
+  //Mixin so blocks know which actor they belong to on creation
+  Blockly.Extensions.register(
+    'add_actor_extension',
+    function() { // this refers to the block that the extension is being run on
+      var thisBlock = this;
+      let dropdown = document.getElementById('actor_list');
+      this.actor_ = dropdown.value;
+    });
     </script>
   <!-- Imports for Flec -->
 <script src="functions.js"></script>
