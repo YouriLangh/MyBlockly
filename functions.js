@@ -6,7 +6,7 @@ let current = -1;
 // jsonList[i] = All the blocks for actor i in JSON
 var jsonList = [];
 // array holding all the types of blocks that have to be created in the Flec category on initialization
-let blockTypeArray = ['when_discovered', 'class_block', 'on_receive', 'console_log', 'time_out', 'crdt', 'crdt_function', 'instance']
+let blockTypeArray = ['when_discovered', 'class_block', 'on_receive', 'console_log', 'time_out', 'crdt', 'crdt_function', 'instance', "share"]
 // a Map which holds all the objects created in the workspace as ["class", new class()]
 const objectMap = new Map()
 // Button for adding new tabs/actors
@@ -14,30 +14,33 @@ let addButton = document.getElementById("add");
 addButton.addEventListener("click", addTab);
 let A1Button = document.getElementById("A1Enter");
 A1Button.addEventListener("click", A1);
-let A2Button = document.getElementById("A2Enter");
-A2Button.addEventListener("click", A2);
 let showButton = document.getElementById("show");
 showButton.addEventListener("click", showCRDT);
 //TODO: Send Msg + expects reply back when calling the add procedure of another actor (add .. to list) will not work due to promise conflict. 
 function A1(){
-  let obj = objectMap.get("pingpong");
+  var e = document.getElementById('actor_list');
+  var actor = e[current].text;
+  let crdt = getObject(`${actor}`);
+  console.log(crdt)
   var input = document.getElementById("A1")
-  obj.list.add(`'${input.value}'`)
+  crdt.add(`'${input.value}'`)
   input.value = '';
 }
 
-function A2(){
-  let obj = objectMap.get("pingpong2");
-  var input = document.getElementById("A2")
-  obj.list.add(`'${input.value}'`)
+//<html><body><ul id="list"></ul></body></html>
 
-  // eval(input.value)
-  input.value = '';
-}
 
 function showCRDT(){
-  let obj = objectMap.get("pingpong")
-  console.log(obj.list.serialize())
+  var myWindow = window.open("", "", "width=400,height=500");
+  var e = document.getElementById('actor_list');
+  var actor = e[current].text;
+  var html = document.getElementById('htmlInput').value;
+  myWindow.document.write(`${html}`)
+  var ul = myWindow.document.getElementById("list");
+  let crdt = getObject(`${actor}`);
+  let set = crdt.serialize();
+  set.forEach((val) => {console.log(val)})
+  set.forEach((val) => {ul.innerHTML += `<li> ${val} </li>`;})
   // print([obj.list.serialize()]);
 }
 

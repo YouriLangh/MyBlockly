@@ -171,7 +171,7 @@ Blockly.Blocks['class_mutator_arg'] = {
 Blockly.Blocks['class_block'] = {
   init: function() {
     this.appendDummyInput()
-    .appendField("Class")
+    .appendField("Object")
     .appendField(new Blockly.FieldTextInput("pingpong"), "class_name")
     .appendField("export object?")
     .appendField(new Blockly.FieldCheckbox("TRUE"), "export")
@@ -422,6 +422,16 @@ Blockly.Blocks['crdt'] = {
     return actor
   }
 };
+Blockly.Blocks['crdt_arg'] = {
+  init: function() {
+    this.appendDummyInput()
+        .appendField(new Blockly.FieldTextInput("list"), "NAME");
+    this.setOutput(true, null);
+    this.setColour(80);
+ this.setTooltip("");
+ this.setHelpUrl("");
+  }
+};
 
 // Definition of the 'receive_mutator_container' used in the decompose function of the 'on_receive' block
 Blockly.Blocks['receive_mutator_container'] = {
@@ -498,6 +508,31 @@ Blockly.Blocks['receive_mutator_container'] = {
    this.setHelpUrl("");
     }
   };
+  Blockly.Blocks['share'] = {
+    init: function() {
+      this.appendValueInput("NAME")
+          .setCheck(null)
+          .appendField("share");
+      this.setPreviousStatement(true, null);
+      this.setNextStatement(true, null);
+      this.setColour(230);
+      this.data = this.dynamicActor();
+   this.setTooltip("");
+   this.setHelpUrl("");
+    },
+    dynamicActor: function() {
+      var e = document.getElementById('actor_list');
+      var actor = e[current].value;
+      return actor
+    }
+  };
+  Blockly.JavaScript['share'] = function(block) {
+    var value_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
+    var id = block.data;
+    // TODO: Assemble JavaScript into code variable.
+    var code = `${value_name}.goOnline(Actor_${id},"shared");\n objectMap.set("Actor_${id}", ${value_name});\n`;
+    return code;
+  };
   Blockly.JavaScript['instance'] = function(block) {
     var value_instance = Blockly.JavaScript.valueToCode(block, 'instance', Blockly.JavaScript.ORDER_ATOMIC);
     // TODO: Assemble JavaScript into code variable.
@@ -524,8 +559,8 @@ Blockly.JavaScript['on_receive'] = function(block) {
 };
 Blockly.JavaScript['crdt'] = function(block) {
   var dropdown_crdt_type = block.getFieldValue('CRDT_type');
-  var code = `new ${dropdown_crdt_type}();`;
-  return [code, Blockly.JavaScript.ORDER_NONE];
+  var code = `new ${dropdown_crdt_type}()`;
+  return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
 Blockly.JavaScript['crdt_function'] = function(block) {
@@ -570,7 +605,13 @@ Blockly.JavaScript['class_block'] = function(block) {
   return code;
 };
 
-
+Blockly.JavaScript['crdt_arg'] = function(block) {
+  var text_name = block.getFieldValue('NAME');
+  // TODO: Assemble JavaScript into code variable.
+  var code = `${text_name}`;
+  // TODO: Change ORDER_NONE to the correct strength.
+  return [code, Blockly.JavaScript.ORDER_ATOMIC];
+};
 Blockly.JavaScript['when_discovered'] = function(block) {
   var actor = block.getFieldValue("ACTOR");
   var object_name = block.getFieldValue('object') || '';

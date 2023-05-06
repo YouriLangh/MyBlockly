@@ -32,6 +32,7 @@
         <button onclick="runCode()">Run JavaScript</button>
       </p>
     </div>
+    <div style="display: flex; flex-direction: row; justify-content: space-between;">
     <div id="Blockly">
       <div id="tabs" style="display: flex; justify-content: space-between; width: 650px; border: 1px solid black">
         <button  id="add">+</button>
@@ -40,9 +41,16 @@
       </div>
       <div id="blocklyDiv" style="height: 500px; width: 650px;"></div>
     </div>
+    <div id="rightSide" style="width: 400px; height: 500px; margin-right: 50px;">
+      <span style="color: rgb(0, 0, 0);">Enter HTML design code here</span>
+      <div style="width: 400px; height: 200px;">
+        <textarea id="htmlInput" name="htmlInput" rows="10" cols="50"></textarea>
+        <button id="show" type="button">Show</button>
+      </div>
+    </div>
+  </div>
     <span>Add to CRDT of "pingpong":</span><input type="text" id="A1" name="A1"> <button id="A1Enter" type="button">Enter</button><br>
-    <span>Add to CRDT of "pingpong2":</span><input type="text" id="A2" name="A2"> <button id="A2Enter" type="button">Enter</button> <br>
-    <button id="show" type="button">Show</button>
+   
     <div id="console" style="margin: 0; height: 200px; width: 700px; background-color: #262626; color: #509C35;">
       <p id="console_p" style="padding: 7px; font-size: smaller;">
          <!-- >> Ping <br>  >> Pong -->
@@ -498,7 +506,20 @@ function FlecDynamicCategoryBlocks(workspace) {
             // Append the name to the field and the field to the block
             fieldNode.appendChild(argumentName);
             param_block.appendChild(fieldNode);
-            xmlList.push(param_block)}}}
+            xmlList.push(param_block)}}
+            if(discoveredBlocks[i].type == "class_block"){
+              let crdts = discoveredBlocks[i].crdts_;
+              for(let idx = 0; idx < crdts; idx++){
+                let crdt_arg_block = createBlocks(['crdt_arg'])[0];
+                const fieldNode = document.createElement('field');
+            fieldNode.setAttribute('name', 'NAME');
+            const argumentName = document.createTextNode('list');
+            // Append the name to the field and the field to the block
+            fieldNode.appendChild(argumentName);
+            crdt_arg_block.appendChild(fieldNode);
+            xmlList.push(crdt_arg_block)
+              }
+            }}
   return xmlList}
   // Add a callback for the Flec category to the workspace
   demoWorkspace.registerToolboxCategoryCallback(
