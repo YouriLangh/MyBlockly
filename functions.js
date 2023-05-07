@@ -42,7 +42,7 @@ function RemoveCRDT(){
   var actor = e[current].text;
   let crdt = getObject(`${actor}`);
   if(crdt){
-    var input = document.getElementById("CRDTRemoveInput")
+    var input = document.getElementById("AddCRDTInput")
     crdt.remove(`'${input.value}'`)
     input.value = '';
   } else {
