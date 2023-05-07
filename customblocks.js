@@ -4,7 +4,6 @@ Blockly.Blocks['when_discovered'] = {
     this.appendDummyInput()
         .appendField("When")
         .appendField(new Blockly.FieldLabelSerializable(this.dynamicActor()), "ACTOR")
-        //.appendField(new Blockly.FieldTextInput(this.dynamicActor()), "ACTOR")
         .appendField("discovers")
         .appendField(new Blockly.FieldTextInput("pingpong"), "object")
         .appendField("as")
@@ -12,7 +11,7 @@ Blockly.Blocks['when_discovered'] = {
         this.appendStatementInput("actions")
         .setCheck(null);
         this.setInputsInline(true);
-        this.setColour(265);
+        this.setColour(245);
         this.setTooltip(WHEN_DISCOVERED_MSG);
         this
   },
@@ -145,27 +144,6 @@ Blockly.Blocks['send_msg_create'] = {
   }
 };
 
-Blockly.Blocks['class_mutator_container'] = {
-  init: function() {
-    this.appendDummyInput()
-        .setAlign(Blockly.ALIGN_RIGHT)
-        .appendField("Crdts:");
-    this.appendStatementInput("STACK")
-        .setCheck(null);
-    this.setColour(60);
- this.setTooltip("");
-  }
-};
-Blockly.Blocks['class_mutator_arg'] = {
-  init: function() {
-    this.appendDummyInput()
-        .appendField("CRDT")
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-    this.setColour(60);
- this.setTooltip("");
-  }
-};
 
 // Definition of the 'class_block' block
 Blockly.Blocks['class_block'] = {
@@ -177,94 +155,11 @@ Blockly.Blocks['class_block'] = {
     .appendField(new Blockly.FieldCheckbox("TRUE"), "export")
     this.appendStatementInput("class_behavior")
     .setCheck(null);
-    this.setColour(60);
+    this.setColour(40);
     this.setTooltip(CLASS_MSG);
     this.data = this.dynamicActor();
     this.crdts_ = 0;
-    this.setMutator(new Blockly.Mutator(['class_mutator_arg'], this));
   },
-  saveExtraState: function() {
-    return {
-      'CRDTS': this.crdts_,
-    };
-  },
-  loadExtraState: function(state) {
-    this.crdts_ = state['CRDTS'];
-    // This is a helper function which adds or removes inputs from the block.
-    this.updateShape_();
-  },
-  decompose: function(workspace) {
-    const containerBlock = workspace.newBlock('class_mutator_container');
-      containerBlock.initSvg();
-      let connection = containerBlock.getInput('STACK').connection;
-      for (let i = 0; i < this.crdts_; i++) {
-        const itemBlock = workspace.newBlock('class_mutator_arg');
-        itemBlock.initSvg();
-        connection.connect(itemBlock.previousConnection);
-        connection = itemBlock.nextConnection;
-      }
-      return containerBlock;
-  },
-  compose: function(containerBlock) {
-    let itemBlock = containerBlock.getInputTargetBlock('STACK');
-    // Count number of inputs.
-    const connections = [];
-    while (itemBlock) {
-      if (itemBlock.isInsertionMarker()) {
-        itemBlock = itemBlock.getNextBlock();
-        continue;
-      }
-      connections.push(itemBlock.valueConnection_);
-      itemBlock = itemBlock.getNextBlock();
-    }
-    // Disconnect any children that don't belong.
-    for (let i = 0; i < this.crdts_; i++) {
-      const connection = this.getInput('ADD' + i).connection.targetConnection;
-      if (connection && connections.indexOf(connection) === -1) {
-        connection.disconnect();
-      }
-    }
-    this.crdts_ = connections.length;
-    this.updateShape_();
-    // Reconnect any child blocks.
-    for (let i = 0; i < this.crdts_; i++) {
-      Blockly.Mutator.reconnect(connections[i], this, 'ADD' + i);
-    }
-    },
-    updateShape_: function() {
-      if (this.crdts_ && this.getInput('EMPTY')) {
-        this.removeInput('EMPTY');
-      } else if (!this.crdts_ && !this.getInput('EMPTY')) {
-
-      }
-      // Add new inputs.
-      for (let i = 0; i < this.crdts_; i++) {
-        if (!this.getInput('ADD' + i)) {
-          const input = this.appendValueInput('ADD' + i)
-          .setCheck("CRDT");
-          this.removeInput('class_behavior', /* no error */ true);
-          if(i == 0){
-            input.appendField('With: ')
-          } else {
-            input.appendField(', ')
-          }
-          const dummy = this.appendDummyInput("DUMMY" + i)
-          dummy.appendField("as")
-          dummy.appendField(new Blockly.FieldTextInput("list"), "NAME" + i)
-          dummy.appendField("share?")
-          dummy.appendField(new Blockly.FieldCheckbox("TRUE"), "SHARE" + i);
-            // input.appendField('CRDT ' + i + ':');
-            if(i == this.crdts_ - 1){
-              this.appendStatementInput('class_behavior');
-            }
-        }
-      }
-      // Remove deleted inputs.
-      for (let i = this.crdts_; this.getInput('ADD' + i); i++) {
-        this.removeInput('ADD' + i);
-        this.removeInput('DUMMY' + i)
-      }
-    },
   dynamicActor: function() {
     var e = document.getElementById('actor_list');
     var actor = e[current].value;
@@ -286,6 +181,7 @@ Blockly.Blocks['receive_mutator_arg'] = {
     },
 };
 
+// Definition of the on_receive block
 Blockly.Blocks['on_receive'] = {
   init: function() {
     this.appendDummyInput("receive_dummy")
@@ -296,7 +192,7 @@ Blockly.Blocks['on_receive'] = {
     .setCheck(null);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-    this.setColour(20);
+    this.setColour(35);
     this.setTooltip(RECEIVE_MSG);
     this.arguments_ = [];
     this.data = this.dynamicActor()
@@ -378,18 +274,7 @@ Blockly.Blocks['on_receive'] = {
       return actor
   },
   };
-// Definition of the 'console_log' block
-Blockly.Blocks['console_log'] = {
-  init: function() {
-    this.appendValueInput("value")
-    .setCheck(null)
-    .appendField("console.log");
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-    this.setColour(110);
-    this.setTooltip(CONSOLE_MSG);
-    }
-};
+
 // Definition of the 'time_out' block
 Blockly.Blocks['time_out'] = {
   init: function() {
@@ -401,19 +286,30 @@ Blockly.Blocks['time_out'] = {
     .setCheck(null);
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
-    this.setColour(90);
+    this.setColour(100);
     this.setTooltip(TIMEOUT_MSG);
     }
 };
-
+// Definition of the 'console_log' block
+Blockly.Blocks['console_log'] = {
+  init: function() {
+    this.appendValueInput("value")
+    .setCheck(null)
+    .appendField("console.log");
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(100);
+    this.setTooltip(CONSOLE_MSG);
+    }
+};
+// Definition of the 'crdt' block
 Blockly.Blocks['crdt'] = {
   init: function() {
     this.appendDummyInput()
         .appendField(new Blockly.FieldDropdown([["AWSet","AWSet"], ["ORSet","ORSet"]]), "CRDT_type")
     this.setOutput(true, "CRDT");
-    this.setColour(75);
- this.setTooltip("");
- this.setHelpUrl("");
+    this.setColour(10);
+ this.setTooltip(CRDT_MSG);
  this.data = this.dynamicActor();
   },
   dynamicActor: function() {
@@ -446,28 +342,27 @@ Blockly.Blocks['receive_mutator_container'] = {
     this.setColour(20);
     this.contextMenu = false;
     },
-  };
-
-  Blockly.Blocks['crdt_function'] = {
-    init: function() {
-      var options = [
-        ["add","add"],
-        ["remove","remove"],
-        ["serialize","serialize"],
-       ];
-       this.appendDummyInput()
-       .appendField(new Blockly.FieldDropdown(options, this.validate), 'FUNCTIONS')
-       this.appendValueInput("element")
-       .setCheck(null)
-      this.appendValueInput("instance")
-      .setCheck("INSTANCE")
-      .appendField('to', 'TEXT')
-      this.setPreviousStatement(true, null);
-      this.setNextStatement(true, null);
-      this.setColour(50);
-      this.setInputsInline(true);
-   this.setTooltip("");
-   this.setHelpUrl("");
+};
+// Definition of the 'crdt_function' block
+Blockly.Blocks['crdt_function'] = {
+  init: function() {
+    var options = [
+      ["add","add"],
+      ["remove","remove"],
+      ["serialize","serialize"],
+    ];
+    this.appendDummyInput()
+    .appendField(new Blockly.FieldDropdown(options, this.validate), 'FUNCTIONS')
+    this.appendValueInput("element")
+    .setCheck(null)
+    this.appendValueInput("instance")
+    .setCheck("INSTANCE")
+    .appendField('to', 'TEXT')
+    this.setPreviousStatement(true, null);
+    this.setNextStatement(true, null);
+    this.setColour(10);
+    this.setInputsInline(true);
+    this.setTooltip(CRDT_FUNCTION_MSG);
     },
     validate: function(newValue) {
       this.getSourceBlock().updateConnections(newValue);
@@ -494,52 +389,29 @@ Blockly.Blocks['receive_mutator_container'] = {
 
       }
     }
-  };
+};
+// Definition of the 'share'  block
+Blockly.Blocks['share'] = {
+  init: function() {
+    this.appendValueInput("crdt")
+    .setCheck("CRDT")
+    .appendField("share");
+    this.appendDummyInput()
+    .appendField("with tag")
+    .appendField("\"")
+    .appendField(new Blockly.FieldTextInput("shared"), "tag")
+    .appendField("\"");
+    this.setColour(10);
+   this.setTooltip(SHARE_MSG);
+   this.data = this.dynamicActor();
+  },
+  dynamicActor: function() {
+    var e = document.getElementById('actor_list');
+    var actor = e[current].value;
+    return actor
+  }
+};
 
-  Blockly.Blocks['instance'] = {
-    init: function() {
-      this.appendValueInput("instance")
-          .setCheck(null)
-          .appendField("instance of");
-      this.setInputsInline(true);
-      this.setOutput(true, "INSTANCE");
-      this.setColour(50);
-   this.setTooltip("");
-   this.setHelpUrl("");
-    }
-  };
-  Blockly.Blocks['share'] = {
-    init: function() {
-      this.appendValueInput("NAME")
-          .setCheck(null)
-          .appendField("share");
-      this.setPreviousStatement(true, null);
-      this.setNextStatement(true, null);
-      this.setColour(230);
-      this.data = this.dynamicActor();
-   this.setTooltip("");
-   this.setHelpUrl("");
-    },
-    dynamicActor: function() {
-      var e = document.getElementById('actor_list');
-      var actor = e[current].value;
-      return actor
-    }
-  };
-  Blockly.JavaScript['share'] = function(block) {
-    var value_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
-    var id = block.data;
-    // TODO: Assemble JavaScript into code variable.
-    var code = `${value_name}.goOnline(Actor_${id},"shared");\n objectMap.set("Actor_${id}", ${value_name});\n`;
-    return code;
-  };
-  Blockly.JavaScript['instance'] = function(block) {
-    var value_instance = Blockly.JavaScript.valueToCode(block, 'instance', Blockly.JavaScript.ORDER_ATOMIC);
-    // TODO: Assemble JavaScript into code variable.
-    var code = `this.${value_instance}`;
-    // TODO: Change ORDER_NONE to the correct strength.
-    return [code, Blockly.JavaScript.ORDER_ATOMIC];
-  };
 // Generate the corresponding JavaScript for each block
 /**
  * Define the behavior of the 'on_receive' block. 
@@ -550,6 +422,7 @@ Blockly.JavaScript['on_receive'] = function(block) {
   var function_name = block.getFieldValue('function_name');
   var id = block.data;
   var behavior = Blockly.JavaScript.statementToCode(block, 'behavior');
+  // For every argument of the on_receive block, add an argument for the function
   if(block.arguments_.length > 0){
     var code = `${function_name}(` + block.arguments_.join(', ') + `, obj = "none"){\n` + "if (obj == 'none'){\n" + behavior + "\n} else {" + `Actor_${id}.whenDiscovered(obj, function (ref) {\n` + behavior + `\n})}};\n`;
   } else {
@@ -557,21 +430,31 @@ Blockly.JavaScript['on_receive'] = function(block) {
   }
   return code;
 };
+
 Blockly.JavaScript['crdt'] = function(block) {
   var dropdown_crdt_type = block.getFieldValue('CRDT_type');
   var code = `new ${dropdown_crdt_type}()`;
   return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
+Blockly.JavaScript['share'] = function(block) {
+  var value_crdt = Blockly.JavaScript.valueToCode(block, 'crdt', Blockly.JavaScript.ORDER_ATOMIC);
+  var text_tag = block.getFieldValue('tag');
+  var id = block.data;
+  // Add the crdt to the object map to allow the addition of items to the CRDT
+  var code = `${value_crdt}.goOnline(Actor_${id}, "${text_tag}");\n objectMap.set("Actor_${id}", ${value_crdt});\n`;
+  return code;
+};
+
 Blockly.JavaScript['crdt_function'] = function(block) {
   var dropdown_functions = block.getFieldValue('FUNCTIONS');
   var value_instance = Blockly.JavaScript.valueToCode(block, 'instance', Blockly.JavaScript.ORDER_ATOMIC);
   var value_element = Blockly.JavaScript.valueToCode(block, 'element', Blockly.JavaScript.ORDER_ATOMIC);
-  console.log(dropdown_functions)
   var code = "";
   if(dropdown_functions == "add" || dropdown_functions == "remove"){
     code =  `${value_instance}.${dropdown_functions}(${value_element});\n`
   } else {
+    // for serialization, instantly display the result
     code = `console.log(${value_instance}.serialize());\n`
   }
   return code;
@@ -583,16 +466,6 @@ Blockly.JavaScript['class_block'] = function(block) {
   var toExport = block.getFieldValue('export') === 'TRUE';
   var statements_class_behavior = Blockly.JavaScript.statementToCode(block, 'class_behavior');
   const elements = [];
-  for (let i = 0; i < block.crdts_; i++) {
-      var crdt = Blockly.JavaScript.valueToCode(block, 'ADD' + i, Blockly.JavaScript.ORDER_NONE) || '';
-      var name = block.getFieldValue('NAME' + i)
-      var share = block.getFieldValue('SHARE' + i) === 'TRUE';
-      var elemCode = `this.${name} = ${crdt}\n`
-      if(share){
-        elemCode += `this.${name}.goOnline(Actor_${id}, "shared");\n`
-      }
-      elements[i] = elemCode
-  }
   var code = ''
   if(toExport){
     code = `class ${class_name} {\n constructor(){\n` + elements.join('\n')+ `}\n  ${statements_class_behavior} };\n objectMap.set("${class_name}", new ${class_name}());\n` 
@@ -605,13 +478,6 @@ Blockly.JavaScript['class_block'] = function(block) {
   return code;
 };
 
-Blockly.JavaScript['crdt_arg'] = function(block) {
-  var text_name = block.getFieldValue('NAME');
-  // TODO: Assemble JavaScript into code variable.
-  var code = `${text_name}`;
-  // TODO: Change ORDER_NONE to the correct strength.
-  return [code, Blockly.JavaScript.ORDER_ATOMIC];
-};
 Blockly.JavaScript['when_discovered'] = function(block) {
   var actor = block.getFieldValue("ACTOR");
   var object_name = block.getFieldValue('object') || '';
@@ -634,6 +500,7 @@ Blockly.JavaScript['send_msg'] = function(block) {
     elements[i] =
       Blockly.JavaScript.valueToCode(block, 'ADD' + i, Blockly.JavaScript.ORDER_NONE) || '';
   }
+  // If a reply is expected, send the id of the current actor too : DEFAULT_ACTOR_ID
   if(reply){
     elements.push(`'DEFAULT_${id}'`)
   }
@@ -641,11 +508,6 @@ Blockly.JavaScript['send_msg'] = function(block) {
   return code;
 };
 
-Blockly.JavaScript['console_log'] = function(block) {
-  var value = Blockly.JavaScript.valueToCode(block, 'value', Blockly.JavaScript.ORDER_ATOMIC);
-  var code = `print([${value}]);\n`;
-  return code;
-};
 
 Blockly.JavaScript['param'] = function(block) {
   var param_name = block.getFieldValue('param_name');
@@ -653,6 +515,11 @@ Blockly.JavaScript['param'] = function(block) {
   return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
 
+Blockly.JavaScript['console_log'] = function(block) {
+  var value = Blockly.JavaScript.valueToCode(block, 'value', Blockly.JavaScript.ORDER_ATOMIC);
+  var code = `console.log(${value});\n`;
+  return code;
+};
 Blockly.JavaScript['time_out'] = function(block) {
   var text_time = block.getFieldValue('time');
   var statements_name = Blockly.JavaScript.statementToCode(block, 'body');

@@ -5,58 +5,73 @@ let current = -1;
 // Array which holds JSON representation of all the blocks for every actor
 // jsonList[i] = All the blocks for actor i in JSON
 var jsonList = [];
-// array holding all the types of blocks that have to be created in the Flec category on initialization
-let blockTypeArray = ['when_discovered', 'class_block', 'on_receive', 'console_log', 'time_out', 'crdt', 'crdt_function', 'instance', "share"]
 // a Map which holds all the objects created in the workspace as ["class", new class()]
-const objectMap = new Map()
-// Button for adding new tabs/actors
+const objectMap = new Map();
+// array holding all the types of blocks that have to be created in the Flec category on initialization
+let blockTypeArray = ['when_discovered', 'class_block', 'on_receive', 'crdt', 'crdt_function', "share", 'time_out' ,"console_log"]
+// Button for adding new tabs/actors and adding objects to crdts
 let addButton = document.getElementById("add");
 addButton.addEventListener("click", addTab);
-let A1Button = document.getElementById("A1Enter");
-A1Button.addEventListener("click", A1);
+let AddCRDTButton = document.getElementById("CRDTButton");
+AddCRDTButton.addEventListener("click", AddCRDT);
+let RemoveCRDTButton = document.getElementById("CRDTRemoveButton");
+RemoveCRDTButton.addEventListener("click", RemoveCRDT);
 let showButton = document.getElementById("show");
 showButton.addEventListener("click", showCRDT);
-//TODO: Send Msg + expects reply back when calling the add procedure of another actor (add .. to list) will not work due to promise conflict. 
-function A1(){
+
+// Adds a given input to the crdt of the current actor
+// CRDTs are stored in the object map under ("Actor_id", crdt) for this reason.
+function AddCRDT(){
   var e = document.getElementById('actor_list');
   var actor = e[current].text;
   let crdt = getObject(`${actor}`);
-  console.log(crdt)
-  var input = document.getElementById("A1")
-  crdt.add(`'${input.value}'`)
-  input.value = '';
+  if(crdt){
+    var input = document.getElementById("AddCRDTInput")
+    crdt.add(`'${input.value}'`)
+    input.value = '';
+  } else {
+  window.alert("No CRDT Exists for this actor")
+  }
+
 }
 
+// Removes a given input from the crdt of the current actor
+// CRDTs are stored in the object map under ("Actor_id", crdt) for this reason.
+function RemoveCRDT(){
+  var e = document.getElementById('actor_list');
+  var actor = e[current].text;
+  let crdt = getObject(`${actor}`);
+  if(crdt){
+    var input = document.getElementById("CRDTRemoveInput")
+    crdt.remove(`'${input.value}'`)
+    input.value = '';
+  } else {
+  window.alert("No CRDT Exists for this actor")
+  }
+
+}
+
+// Standard code for HTML input text-area
 //<html><body><ul id="list"></ul></body></html>
 
-
+// Uses the given HTML to construct a new window which showcases the contents of the CRDT
 function showCRDT(){
-  var myWindow = window.open("", "", "width=400,height=500");
   var e = document.getElementById('actor_list');
   var actor = e[current].text;
   var html = document.getElementById('htmlInput').value;
-  myWindow.document.write(`${html}`)
-  var ul = myWindow.document.getElementById("list");
   let crdt = getObject(`${actor}`);
-  let set = crdt.serialize();
-  set.forEach((val) => {console.log(val)})
-  set.forEach((val) => {ul.innerHTML += `<li> ${val} </li>`;})
-  // print([obj.list.serialize()]);
+  if(crdt){
+    var myWindow = window.open("", "", "width=400,height=500");
+    myWindow.document.write(`${html}`)
+  var ul = myWindow.document.getElementById("list");
+    let set = crdt.serialize();
+    set.forEach((val) => {ul.innerHTML += `<li> ${val} </li>`;})
+  } else {
+    window.alert("No CRDT Exists for this actor. Cannot show elements")
+  }
+
 }
 
-/**
- * Function to print to console on HTML page
- * Takes an array with strings, and adds them to the console with a breakline in between.
- * @param arr 
- */
-function print(arr){
-  var console = document.getElementById("console_p")
-  for(let idx in arr){
-    var str = arr[idx];
-    var br = document.createElement('br')
-    console.append(str)
-    console.append(br)}
-}
 /**
  * Construct the blocks required by the flyout
  * @param arr An array containing the types of all the blocks that have to be created
@@ -70,15 +85,6 @@ function createBlocks(arr){
     block.setAttribute('type', type)
     list.push(block);}
   return list;
-}
-/**
- * Function to clear the console on HTML page
- */
-function clearConsole(){
-  var p = document.getElementById("console_p")
-  while (p.hasChildNodes()) {
-    p.removeChild(p.firstChild);
-  }
 }
 /**
  * Generates the code for all the actors/tabs
@@ -135,6 +141,7 @@ function addActor(){
 function ConfigToCode(){
   // For every actor, generate the code to create a new actor and register it to the switchboard
     var dropdown = document.getElementById('actor_list');
+
     var str = 'const ctx = new TSAT("vma"); \n'
     let opts = dropdown.options
     for (let i = 0; i < opts.length; i++) {

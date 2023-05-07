@@ -25,37 +25,32 @@
 </head>
 <body>
   <!-- Layout of the page, dividing it in the blocklyDiv and the console-->
-  <div id="main_div" style="padding: 20px; border: 1px solid rgb(173, 173, 173)">
+  <div id="main_div">
     <div id="top_buttons">
       <p>
         <button onclick="showCode()">Show JavaScript</button>
         <button onclick="runCode()">Run JavaScript</button>
       </p>
     </div>
-    <div style="display: flex; flex-direction: row; justify-content: space-between;">
+    <div style="display: flex;">
     <div id="Blockly">
       <div id="tabs" style="display: flex; justify-content: space-between; width: 650px; border: 1px solid black">
         <button  id="add">+</button>
-      <select  name="actor_list" id="actor_list" onchange="changeTab(this);">
+      <select name="actor_list" id="actor_list" onchange="changeTab(this);">
       </select>
       </div>
-      <div id="blocklyDiv" style="height: 500px; width: 650px;"></div>
+      <div id="blocklyDiv" style="height: 550px; width: 650px;"></div>
     </div>
-    <div id="rightSide" style="width: 400px; height: 500px; margin-right: 50px;">
-      <span style="color: rgb(0, 0, 0);">Enter HTML design code here</span>
-      <div style="width: 400px; height: 200px;">
-        <textarea id="htmlInput" name="htmlInput" rows="10" cols="50"></textarea>
+    <div id="rightSide" style="width: 400px; height: 500px; margin-right: 50px;  margin-left: 10%;">
+        <span>Edit the content of CRDTs and visualize them!</span>
+        <input style="margin-bottom: 20px; margin-top: 15px;" placeholder="Add to CRDT of actor" type="text" id="AddCRDTInput" name="AddCRDT"> <button id="CRDTButton" type="button">Add</button><br>
+        <input style="margin-bottom: 20px; width: 190px;" placeholder="Remove from CRDT of actor" type="text" id="CRDTRemoveInput" name="CRDTRemoveInput"> <button id="CRDTRemoveButton" type="button">Remove</button><br>
+        <textarea placeholder="Enter HTML design code here" id="htmlInput" name="htmlInput" rows="10" cols="50"></textarea>
         <button id="show" type="button">Show</button>
-      </div>
     </div>
   </div>
-    <span>Add to CRDT of "pingpong":</span><input type="text" id="A1" name="A1"> <button id="A1Enter" type="button">Enter</button><br>
+    
    
-    <div id="console" style="margin: 0; height: 200px; width: 700px; background-color: #262626; color: #509C35;">
-      <p id="console_p" style="padding: 7px; font-size: smaller;">
-         <!-- >> Ping <br>  >> Pong -->
-      </p>
-    </div>
       <!-- A hidden BlocklyDiv is required to convert the blocks to code of the tabs that are not currently selected -->
     <div id="hidden_blockyDiv" style="visibility: hidden; position: absolute; top: 0;">
     </div>
@@ -451,7 +446,6 @@
       // Current tab might have been edited, save these changes first
       saveWorkspace();
       // clear the console
-      clearConsole();
       window.LoopTrap = 1000;
       Blockly.JavaScript.INFINITE_LOOP_TRAP = 'if (--window.LoopTrap < 0) throw "Infinite loop.";\n';
       // Generate JavaScript code and run it with eval(code).
@@ -507,33 +501,13 @@ function FlecDynamicCategoryBlocks(workspace) {
             fieldNode.appendChild(argumentName);
             param_block.appendChild(fieldNode);
             xmlList.push(param_block)}}
-            if(discoveredBlocks[i].type == "class_block"){
-              let crdts = discoveredBlocks[i].crdts_;
-              for(let idx = 0; idx < crdts; idx++){
-                let crdt_arg_block = createBlocks(['crdt_arg'])[0];
-                const fieldNode = document.createElement('field');
-            fieldNode.setAttribute('name', 'NAME');
-            const argumentName = document.createTextNode('list');
-            // Append the name to the field and the field to the block
-            fieldNode.appendChild(argumentName);
-            crdt_arg_block.appendChild(fieldNode);
-            xmlList.push(crdt_arg_block)
-              }
-            }}
+            }
   return xmlList}
   // Add a callback for the Flec category to the workspace
   demoWorkspace.registerToolboxCategoryCallback(
     'FLEC', FlecCategoryCallback);
     // initialize the javascript generator
   Blockly.JavaScript.init(demoWorkspace)
-  //Mixin so blocks know which actor they belong to on creation
-  Blockly.Extensions.register(
-    'add_actor_extension',
-    function() { // this refers to the block that the extension is being run on
-      var thisBlock = this;
-      let dropdown = document.getElementById('actor_list');
-      this.actor_ = dropdown.value;
-    });
     </script>
   <!-- Imports for Flec -->
 <script src="functions.js"></script>
