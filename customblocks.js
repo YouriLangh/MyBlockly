@@ -13,7 +13,6 @@ Blockly.Blocks['when_discovered'] = {
         this.setInputsInline(true);
         this.setColour(245);
         this.setTooltip(WHEN_DISCOVERED_MSG);
-        this
   },
   dynamicActor: function() {
       var e = document.getElementById('actor_list');
@@ -150,7 +149,7 @@ Blockly.Blocks['class_block'] = {
   init: function() {
     this.appendDummyInput()
     .appendField("Object")
-    .appendField(new Blockly.FieldTextInput("pingpong"), "class_name")
+    .appendField(new Blockly.FieldTextInput("DEFAULT_Actor_" + this.dynamicActor()), "class_name")
     .appendField("export object?")
     .appendField(new Blockly.FieldCheckbox("TRUE"), "export")
     this.appendStatementInput("class_behavior")
@@ -433,6 +432,7 @@ Blockly.JavaScript['on_receive'] = function(block) {
 
 Blockly.JavaScript['crdt'] = function(block) {
   var dropdown_crdt_type = block.getFieldValue('CRDT_type');
+  console.log(dropdown_crdt_type);
   var code = `new ${dropdown_crdt_type}()`;
   return [code, Blockly.JavaScript.ORDER_ATOMIC];
 };
@@ -468,11 +468,11 @@ Blockly.JavaScript['class_block'] = function(block) {
   const elements = [];
   var code = ''
   if(toExport){
-    code = `class ${class_name} {\n constructor(){\n` + elements.join('\n')+ `}\n  ${statements_class_behavior} };\n objectMap.set("${class_name}", new ${class_name}());\n` 
-    + `Actor_${id}.doExport('${class_name}', `+ `getObject('${class_name}')` + `); \n`
+    code = `class ${class_name} {\n constructor(){}\n  ${statements_class_behavior} };\n objectMap.set("${class_name}", new ${class_name}());\n` 
+    + `Actor_${id}.doExport('${class_name}', `+ `objectMap.get('${class_name}')` + `); \n`
     ;
   } else {
-    code = `class ${class_name} {\n constructor(){\n` +  elements.join('\n')+ `}\n  ${statements_class_behavior} };\n objectMap.set("${class_name}", new ${class_name}());\n`;
+    code = `class ${class_name} {\n constructor(){}\n  ${statements_class_behavior} };\n objectMap.set("${class_name}", new ${class_name}());\n`;
   }
   
   return code;

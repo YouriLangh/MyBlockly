@@ -142,7 +142,7 @@ function ConfigToCode(){
   // For every actor, generate the code to create a new actor and register it to the switchboard
     var dropdown = document.getElementById('actor_list');
 
-    var str = 'const ctx = new TSAT("vma"); \n'
+    var str = 'const objectMap = new Map();\nconst ctx = new TSAT("vma"); \n'
     let opts = dropdown.options
     for (let i = 0; i < opts.length; i++) {
         str += `const ${opts[i].text} = new Actor(\"${opts[i].text}\"); \n` +

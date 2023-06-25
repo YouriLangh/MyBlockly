@@ -1,14 +1,12 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ORSet = void 0;
-const crdt_1 = require("../../crdt");
-var SetOperation;
-(function (SetOperation) {
-    SetOperation[SetOperation["Add"] = 0] = "Add";
-    SetOperation[SetOperation["Clear"] = 1] = "Clear";
-    SetOperation[SetOperation["Remove"] = 2] = "Remove";
-})(SetOperation || (SetOperation = {}));
-class ORSet extends crdt_1.CRDT {
+class setOperation{
+    constructor(){
+        this.Add = 0;
+        this.Clear = 1;
+        this.Remove = 2;
+    }
+}
+const SetOperation = new setOperation();
+class ORSet extends CRDT {
     constructor(tag, callback) {
         super(tag);
         this.set = {};
@@ -61,5 +59,4 @@ class ORSet extends crdt_1.CRDT {
             this.performOp(SetOperation.Remove, [element, Object.keys(el.ids)]);
     }
 }
-exports.ORSet = ORSet;
 //# sourceMappingURL=orset2.js.map

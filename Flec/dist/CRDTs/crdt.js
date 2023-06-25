@@ -1,7 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CRDT = void 0;
-//import * as TSAT from "../sb";
 class CRDT {
     constructor(tag) {
         this.replicas = [];
